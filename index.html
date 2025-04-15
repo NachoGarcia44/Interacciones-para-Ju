@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Justificación de Interacciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #003366;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card h2 {
+      color: #004080;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .upload {
+      margin-top: 0.5rem;
+    }
+    .readonly input,
+    .readonly textarea,
+    .readonly input[type="file"] {
+      background-color: #f0f0f0;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .save-button {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.75rem 1.5rem;
+      background-color: #003366;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Justificación de Interacciones</h1>
+  <div id="container"></div>
+  <button class="save-button" onclick="guardarDatos()">Guardar datos</button>
+
+  <script>
+    const container = document.getElementById('container');
+    const currentUser = prompt("Ingrese su nombre de usuario para continuar:");
+    const userAllowed = "nacho";
+    const readOnlyClass = currentUser.trim().toLowerCase() !== userAllowed ? 'readonly' : '';
+
+    function cargarDatosPrevios() {
+      const datosGuardados = JSON.parse(localStorage.getItem('interacciones')) || [];
+      return datosGuardados;
+    }
+
+    function guardarDatos() {
+      const datos = [];
+      for (let i = 1; i <= 7; i++) {
+        datos.push({
+          numero: i,
+          caso: document.getElementById(`caso-${i}`).value,
+          fecha: document.getElementById(`fecha-${i}`).value,
+          justificacion: document.getElementById(`justificacion-${i}`).value
+        });
+      }
+      localStorage.setItem('interacciones', JSON.stringify(datos));
+      alert('Datos guardados correctamente.');
+    }
+
+    const datosCargados = cargarDatosPrevios();
+
+    for (let i = 1; i <= 7; i++) {
+      const card = document.createElement('div');
+      card.className = `card ${readOnlyClass}`;
+      const dato = datosCargados.find(d => d.numero === i) || {};
+      card.innerHTML = `
+        <h2>Interacción #${i}</h2>
+        <div class="form-group">
+          <label>Numero de caso</label>
+          <input type="text" id="caso-${i}" value="${dato.caso || ''}" />
+        </div>
+        <div class="form-group">
+          <label>Fecha y hora aproximada</label>
+          <input type="datetime-local" id="fecha-${i}" value="${dato.fecha || ''}" />
+        </div>
+        <div class="form-group">
+          <label>Justificación de la interacción</label>
+          <textarea rows="4" id="justificacion-${i}">${dato.justificacion || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Evidencia / Imagen (opcional)</label>
+          <input type="file" class="upload" />
+        </div>
+      `;
+      container.appendChild(card);
+    }
+  </script>
+</body>
+</html>
